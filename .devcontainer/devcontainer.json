@@ -1,17 +1,19 @@
 {
   "name": "Virtual Chrome",
   "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "overrideCommand": false,
   "forwardPorts": [3000, 3001],
   "portsAttributes": {
     "3000": {
       "label": "Chrome HTTP",
-      "onAutoForward": "openPreview"
+      "onAutoForward": "openBrowser"
     },
     "3001": {
       "label": "Chrome HTTPS",
       "onAutoForward": "notify"
     }
   },
-  "postCreateCommand": "docker rm -f chrome || true && docker run -d --name=chrome -e PUID=1000 -e PGID=1000 -e TZ=America/New_York -p 3000:3000 -p 3001:3001 -v /tmp/chrome-data:/config --shm-size=2gb --restart unless-stopped lscr.io/linuxserver/chrome:latest",
-  "postStartCommand": "docker start chrome || docker run -d --name=chrome -e PUID=1000 -e PGID=1000 -e TZ=America/New_York -p 3000:3000 -p 3001:3001 -v /tmp/chrome-data:/config --shm-size=2gb --restart unless-stopped lscr.io/linuxserver/chrome:latest; nohup bash -c 'for i in 1 2 3 4 5 6 7 8 9 10; do gh codespace ports visibility 3000:public 3001:public -c $CODESPACE_NAME && sleep 5; done' >/tmp/ports.log 2>&1 &"
+  "postCreateCommand": "bash -c 'for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do docker info >/dev/null 2>&1 && break; sudo /usr/local/share/docker-init.sh >/dev/null 2>&1 & sleep 2; done; docker rm -f chrome || true; docker run -d --name=chrome --security-opt seccomp=unconfined -e PUID=1000 -e PGID=1000 -e TZ=America/New_York -p 3000:3000 -p 3001:3001 -v /tmp/chrome-data:/config --shm-size=2gb --restart unless-stopped lscr.io/linuxserver/chrome:latest'",
+  "postStartCommand": "bash -c 'for i in 1 2 3 4 5 6 7 8 9 10; do docker info >/dev/null 2>&1 && break; sudo /usr/local/share/docker-init.sh >/dev/null 2>&1 & sleep 2; done; docker start chrome || docker run -d --name=chrome --security-opt seccomp=unconfined -e PUID=1000 -e PGID=1000 -e TZ=America/New_York -p 3000:3000 -p 3001:3001 -v /tmp/chrome-data:/config --shm-size=2gb --restart unless-stopped lscr.io/linuxserver/chrome:latest; nohup bash -c \"for j in 1 2 3 4 5 6 7 8 9 10 11 12; do gh codespace ports visibility 3000:public 3001:public -c \\$CODESPACE_NAME >/dev/null 2>&1; sleep 5; done\" >/tmp/ports.log 2>&1 &'",
+  "postAttachCommand": "bash -c 'nohup bash -c \"for j in 1 2 3 4 5 6; do gh codespace ports visibility 3000:public 3001:public -c \\$CODESPACE_NAME >/dev/null 2>&1; sleep 3; done\" >/tmp/ports_attach.log 2>&1 &'"
 }
